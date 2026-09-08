@@ -174,7 +174,7 @@
                     <ListBox x:Name="EventList"
                              BorderThickness="0"
                              Background="Transparent"
-                             MouseDoubleClick="EventList_MouseDoubleClick">
+                             MouseLeftButtonUp="EventList_MouseLeftButtonUp">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="0,0,0,8">

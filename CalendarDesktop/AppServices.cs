@@ -35,6 +35,8 @@ public static class AppServices
         services.AddDbContext<AppDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
         services.AddScoped<EventService>();
         services.AddScoped<GoogleCalendarService>();
+        services.AddSingleton<EventReminderService>();
+        services.AddSingleton<TrayIconService>();
 
         var provider = services.BuildServiceProvider();
 

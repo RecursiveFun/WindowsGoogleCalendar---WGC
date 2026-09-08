@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using CalendarDesktop.Models;
 
 namespace CalendarDesktop;
@@ -7,15 +8,15 @@ namespace CalendarDesktop;
 public partial class EventDialog : Window
 {
     public CalendarEvent Event { get; }
+    public EventDialogMode Mode { get; }
     public bool DeleteRequested { get; private set; }
+    public bool EditRequested { get; private set; }
 
-    public EventDialog(CalendarEvent calendarEvent)
+    public EventDialog(CalendarEvent calendarEvent, EventDialogMode mode)
     {
         InitializeComponent();
         Event = calendarEvent;
-
-        DialogTitle.Text = calendarEvent.Id == 0 ? "New event" : "Edit event";
-        DeleteButton.Visibility = calendarEvent.Id == 0 ? Visibility.Collapsed : Visibility.Visible;
+        Mode = mode;
 
         TitleBox.Text = calendarEvent.Title;
         StartDate.SelectedDate = calendarEvent.StartDateTime.Date;
@@ -25,10 +26,49 @@ public partial class EventDialog : Window
         AllDayBox.IsChecked = calendarEvent.IsAllDay;
         LocationBox.Text = calendarEvent.Location ?? "";
         DescriptionBox.Text = calendarEvent.Description ?? "";
+
+        ApplyMode(mode);
+    }
+
+    private void ApplyMode(EventDialogMode mode)
+    {
+        DialogTitle.Text = mode.WindowTitle;
+        Title = mode.WindowTitle;
+
+        SetReadOnly(TitleBox, mode.IsReadOnly);
+        SetReadOnly(StartTime, mode.IsReadOnly);
+        SetReadOnly(EndTime, mode.IsReadOnly);
+        SetReadOnly(LocationBox, mode.IsReadOnly);
+        SetReadOnly(DescriptionBox, mode.IsReadOnly);
+
+        StartDate.IsEnabled = !mode.IsReadOnly;
+        EndDate.IsEnabled = !mode.IsReadOnly;
+        AllDayBox.IsEnabled = !mode.IsReadOnly;
+
+        EditButton.Visibility = mode.ShowEditButton ? Visibility.Visible : Visibility.Collapsed;
+        SaveButton.Visibility = mode.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
+        DeleteButton.Visibility = mode.ShowDeleteButton ? Visibility.Visible : Visibility.Collapsed;
+        CancelButton.Content = mode.IsReadOnly ? "Close" : "Cancel";
+        SaveButton.IsDefault = mode.ShowSaveButton;
+        EditButton.IsDefault = mode.ShowEditButton;
+    }
+
+    private static void SetReadOnly(TextBox box, bool readOnly)
+    {
+        box.IsReadOnly = readOnly;
+        box.Focusable = !readOnly;
+    }
+
+    private void Edit_Click(object sender, RoutedEventArgs e)
+    {
+        EditRequested = true;
+        DialogResult = true;
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
+        if (Mode.IsReadOnly) return;
+
         if (string.IsNullOrWhiteSpace(TitleBox.Text))
         {
             MessageBox.Show(this, "Title is required.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);

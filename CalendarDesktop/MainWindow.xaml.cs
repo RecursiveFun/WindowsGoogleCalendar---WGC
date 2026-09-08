@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -15,6 +16,7 @@ public partial class MainWindow : Window
 
     private readonly EventService _events;
     private readonly GoogleCalendarService _google;
+    private readonly TrayIconService _tray;
     private readonly DispatcherTimer _autoSyncTimer;
     private DateTime _visibleMonth;
     private List<CalendarEvent> _monthEvents = [];
@@ -26,6 +28,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         _events = App.Services.GetRequiredService<EventService>();
         _google = App.Services.GetRequiredService<GoogleCalendarService>();
+        _tray = App.Services.GetRequiredService<TrayIconService>();
         _visibleMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
         _autoSyncTimer = new DispatcherTimer { Interval = AutoSyncInterval };
@@ -40,7 +43,20 @@ public partial class MainWindow : Window
             _autoSyncTimer.Start();
         };
 
-        Closed += (_, _) => _autoSyncTimer.Stop();
+        Closing += MainWindow_Closing;
+    }
+
+    private void MainWindow_Closing(object? sender, CancelEventArgs e)
+    {
+        if (_tray.IsExitRequested)
+        {
+            _autoSyncTimer.Stop();
+            return;
+        }
+
+        // Close hides to the notification area so reminders keep running.
+        e.Cancel = true;
+        _tray.HideMainWindowToTray(this);
     }
 
     private void UpdateSetupButtonVisibility()
@@ -165,8 +181,11 @@ public partial class MainWindow : Window
                         Background = new SolidColorBrush(Color.FromRgb(255, 183, 77)),
                         Padding = new Thickness(4, 2, 4, 2),
                         Margin = new Thickness(0, 0, 0, 2),
-                        ToolTip = ev.Title
+                        ToolTip = ev.Title,
+                        Cursor = Cursors.Hand,
+                        Tag = ev
                     };
+                    chip.MouseLeftButtonUp += EventChip_Click;
                     stack.Children.Add(chip);
                 }
 
@@ -185,6 +204,13 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void EventChip_Click(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not TextBlock { Tag: CalendarEvent item }) return;
+        e.Handled = true;
+        await OpenEventAsync(item);
+    }
+
     private async void DayCell_Click(object sender, MouseButtonEventArgs e)
     {
         if (sender is not Border { Tag: DateTime date }) return;
@@ -196,7 +222,7 @@ public partial class MainWindow : Window
             StartDateTime = date.Date.AddHours(9),
             EndDateTime = date.Date.AddHours(10)
         };
-        await EditEventAsync(draft, isNew: true);
+        await OpenEventAsync(draft, isNew: true);
     }
 
     private async void NewEvent_Click(object sender, RoutedEventArgs e)
@@ -207,59 +233,81 @@ public partial class MainWindow : Window
             StartDateTime = DateTime.Now.AddMinutes(30),
             EndDateTime = DateTime.Now.AddHours(1.5)
         };
-        await EditEventAsync(draft, isNew: true);
+        await OpenEventAsync(draft, isNew: true);
     }
 
-    private async void EventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private async void EventList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if (EventList.SelectedItem is CalendarEvent selected)
         {
-            await EditEventAsync(selected, isNew: false);
+            await OpenEventAsync(selected);
         }
     }
 
-    private async Task EditEventAsync(CalendarEvent item, bool isNew)
+    private async Task OpenEventAsync(CalendarEvent item, bool isNew = false)
     {
-        var dialog = new EventDialog(item) { Owner = this };
-        if (dialog.ShowDialog() != true) return;
+        EventDialogMode mode = isNew
+            ? new CreateEventMode()
+            : new ViewEventMode();
 
-        if (dialog.DeleteRequested && !isNew)
+        while (true)
         {
-            await _google.DeleteGoogleEventAsync(item.GoogleEventId);
-            await _events.DeleteAsync(item.Id);
-            FooterText.Text = "Event deleted.";
+            var dialog = new EventDialog(item, mode) { Owner = this };
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            if (dialog.EditRequested)
+            {
+                mode = new EditEventMode();
+                continue;
+            }
+
+            if (dialog.DeleteRequested && !isNew)
+            {
+                await _google.DeleteGoogleEventAsync(item.GoogleEventId);
+                await _events.DeleteAsync(item.Id);
+                FooterText.Text = "Event deleted.";
+                await RefreshAsync();
+                return;
+            }
+
+            if (mode.IsReadOnly)
+            {
+                return;
+            }
+
+            CalendarEvent saved;
+            if (isNew)
+            {
+                saved = await _events.CreateAsync(dialog.Event);
+            }
+            else
+            {
+                saved = await _events.UpdateAsync(dialog.Event);
+            }
+
+            if (await _google.IsConnectedAsync())
+            {
+                FooterText.Text = "Syncing to Google Calendar…";
+                var push = await _google.PushEventAsync(saved);
+                FooterText.Text = push.Message;
+                if (!push.Success)
+                {
+                    MessageBox.Show(this, push.Message, "Google sync", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            else
+            {
+                FooterText.Text = isNew
+                    ? "Event saved locally. Sign in with Google to sync."
+                    : "Event updated locally. Sign in with Google to sync.";
+            }
+
             await RefreshAsync();
             return;
         }
-
-        CalendarEvent saved;
-        if (isNew)
-        {
-            saved = await _events.CreateAsync(dialog.Event);
-        }
-        else
-        {
-            saved = await _events.UpdateAsync(dialog.Event);
-        }
-
-        if (await _google.IsConnectedAsync())
-        {
-            FooterText.Text = "Syncing to Google Calendar…";
-            var push = await _google.PushEventAsync(saved);
-            FooterText.Text = push.Message;
-            if (!push.Success)
-            {
-                MessageBox.Show(this, push.Message, "Google sync", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-        else
-        {
-            FooterText.Text = isNew
-                ? "Event saved locally. Sign in with Google to sync."
-                : "Event updated locally. Sign in with Google to sync.";
-        }
-
-        await RefreshAsync();
     }
 
     private void GoogleSetup_Click(object sender, RoutedEventArgs e)

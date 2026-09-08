@@ -19,6 +19,15 @@ public class EventService
             .OrderBy(e => e.StartDateTime)
             .ToListAsync();
 
+    /// <summary>
+    /// Events whose start falls in (startExclusive, endInclusive].
+    /// </summary>
+    public Task<List<CalendarEvent>> GetStartingBetweenAsync(DateTime startExclusive, DateTime endInclusive) =>
+        _db.Events
+            .Where(e => e.StartDateTime > startExclusive && e.StartDateTime <= endInclusive)
+            .OrderBy(e => e.StartDateTime)
+            .ToListAsync();
+
     public async Task<CalendarEvent> CreateAsync(CalendarEvent item)
     {
         item.CreatedAt = DateTime.UtcNow;

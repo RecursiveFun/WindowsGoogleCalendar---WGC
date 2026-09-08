@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Threading;
 using CalendarDesktop.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,6 +7,8 @@ namespace CalendarDesktop;
 public partial class App : Application
 {
     public static ServiceProvider Services { get; private set; } = null!;
+    private EventReminderService? _reminders;
+    private TrayIconService? _tray;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -34,6 +35,10 @@ public partial class App : Application
         try
         {
             Services = AppServices.Build();
+            _tray = Services.GetRequiredService<TrayIconService>();
+            _tray.Initialize();
+            _reminders = Services.GetRequiredService<EventReminderService>();
+            _reminders.Start();
             base.OnStartup(e);
         }
         catch (Exception ex)
@@ -50,6 +55,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _reminders?.Dispose();
+        _tray?.Dispose();
         Services?.Dispose();
         AppLog.Close();
         base.OnExit(e);

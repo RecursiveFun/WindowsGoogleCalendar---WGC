@@ -1,6 +1,6 @@
-# WindowsGoogleCalendar---WGC
+# CalendarApp
 
-Native Windows desktop calendar with two-way Google Calendar sync.
+Native Windows desktop calendar with two-way **Google Calendar** sync, toast reminders, and tray background mode.
 
 Built with **WPF** (.NET 9), **Material Design**, **SQLite**, and the **Google Calendar API**.
 
@@ -8,13 +8,30 @@ Built with **WPF** (.NET 9), **Material Design**, **SQLite**, and the **Google C
 
 ## Features
 
-- Month view with event list and create / edit / delete
+### Calendar
+- Month grid with up to 3 event chips per day
+- Side list of events for the visible month
+- Create, edit, and delete events (dialog)
+- Double-click a day to create; double-click a list item to edit
+- All-day and timed events, plus location and description
+
+### Google Calendar sync
 - Sign in with Google (Desktop OAuth)
-- Push local creates, updates, and deletes to Google Calendar
-- Pull / auto-sync from Google (startup, every 5 minutes, and when the window is focused)
+- **Push**: local create / update / delete syncs to Google when signed in
+- **Pull**: imports Google events and updates local copies
+- **Auto-sync** on startup, every **5 minutes**, and when the window is focused
 - Removes local events that were deleted in Google Calendar
+- **Advanced Google setup** only appears if OAuth is not already configured
+
+### Reminders & background
+- Windows **toast notification** ~**15 minutes** before a timed event starts
+- Closing the main window **does not quit** — the app stays in the **notification area (tray)** so reminders and sync keep running
+- Tray: double-click or **Open CalendarApp** to restore; **Exit** to quit for real
+
+### App polish
 - Dark + orange Material Design UI
-- Local SQLite storage under `%LocalAppData%\CalendarApp`
+- Local SQLite storage and rolling logs under `%LocalAppData%\CalendarApp`
+- Versioned Release packaging via `scripts/publish.ps1`
 
 ---
 
@@ -60,14 +77,28 @@ Credentials are stored at:
 |---|---|
 | Change month | ◀ / ▶ or **Today** |
 | New event | **New event**, or double-click a day |
-| Edit / delete event | Double-click an event in the list |
+| View event details | Click an event in the list or a day chip |
+| Edit event | Open details → **Edit** → **Save** |
+| Delete event | From details or edit → **Delete** |
 | Connect Google | **Sign in with Google** |
+| Sign out | Button becomes **Sign out** when connected |
 | Force sync | **Sync with Google** |
+| Hide to tray | Close the window (X) |
+| Open from tray | Double-click tray icon, or right-click → **Open CalendarApp** |
+| Quit completely | Tray → right-click → **Exit** |
 
-When signed in:
+### Sync behavior (when signed in)
 
-- New/updated events are pushed to Google automatically
-- Google deletions are removed locally on the next sync
+- Creating or editing an event **pushes** it to Google immediately
+- Deleting an event removes it from Google when possible
+- Auto-sync **pulls** changes from Google (including deletions)
+- Footer status shows sync progress and results
+
+### Reminders
+
+- While the app is running (window open **or** in the tray), timed events get a toast ~15 minutes before start
+- All-day events do **not** trigger toast reminders
+- Each event is notified once per start time (no spam if the checker runs again)
 
 ---
 
@@ -76,18 +107,26 @@ When signed in:
 ```
 DotNetApp/
 ├── CalendarApp.sln
-├── CalendarDesktop/          # WPF app
+├── CalendarDesktop/                 # WPF app
 │   ├── Assets/app.ico
-│   ├── Services/             # Events + Google Calendar
-│   ├── Data/                 # EF Core + SQLite
+│   ├── Services/
+│   │   ├── EventService.cs
+│   │   ├── GoogleCalendarService.cs
+│   │   ├── EventReminderService.cs  # Toast reminders
+│   │   ├── TrayIconService.cs       # Notification-area icon
+│   │   └── AppLog.cs
+│   ├── Data/                        # EF Core + SQLite
 │   ├── Models/
-│   └── MainWindow.xaml
+│   ├── MainWindow.xaml
+│   ├── EventDialog.xaml
+│   └── GoogleSetupWindow.xaml
 ├── scripts/
-│   ├── publish.ps1           # Release package builder
-│   └── CalendarApp.iss       # Optional Inno Setup installer
-├── artifacts/                # Publish output (generated)
-├── PRODUCTION.md             # Production checklist & details
-└── archive/                  # Older web / WebView experiments
+│   ├── publish.ps1                  # Release package builder
+│   └── CalendarApp.iss              # Optional Inno Setup installer
+├── artifacts/                       # Publish output (generated, gitignored)
+├── PRODUCTION.md                    # Production checklist & details
+├── README.md
+└── archive/                         # Older web / WebView experiments
 ```
 
 ---
@@ -142,7 +181,7 @@ This will:
    - `artifacts\CalendarApp-1.0.0-win-x64\`
    - `artifacts\CalendarApp-1.0.0-win-x64.zip`
 
-End users unzip (or install) and click **Sign in with Google** — no setup dialog.
+End users unzip (or install), run `CalendarApp.exe`, and click **Sign in with Google** — no setup dialog when OAuth is embedded.
 
 ### Optional installer
 
@@ -187,17 +226,21 @@ More detail: [PRODUCTION.md](PRODUCTION.md)
 | “This app’s request is invalid” | OAuth client must be **Desktop app**, not Web |
 | Sign-in works for you but not others | Consent screen still **Testing** — add them as test users or publish |
 | Events don’t appear in Google | Confirm status shows your email (signed in); check footer / logs |
-| Deleted Google events still show | Wait for auto-sync, click **Sync with Google**, or restart the app |
+| Deleted Google events still show | Wait for auto-sync, click **Sync with Google**, or restore from tray and sync |
+| No toast reminder | App must be running (window or tray); event must be timed (not all-day); start within ~15 minutes |
+| Closed the window and can’t find the app | Check the notification area (system tray); double-click the CalendarApp icon |
+| Want to quit completely | Tray → right-click → **Exit** |
 | Crash / sync errors | `%LocalAppData%\CalendarApp\logs\` |
 
 ---
 
 ## Tech stack
 
-- .NET 9 / WPF
+- .NET 9 / WPF (+ Windows Forms NotifyIcon for tray)
 - MaterialDesignThemes
 - Entity Framework Core + SQLite
 - Google.Apis.Calendar.v3 + Google.Apis.Auth
+- Microsoft.Toolkit.Uwp.Notifications (toasts)
 - Serilog
 
 ---
