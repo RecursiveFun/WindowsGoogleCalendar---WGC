@@ -1,0 +1,217 @@
+﻿<Window x:Class="CalendarDesktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="CalendarApp"
+        Height="820" Width="1280"
+        MinHeight="640" MinWidth="1000"
+        WindowStartupLocation="CenterScreen"
+        Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        Background="{DynamicResource MaterialDesign.Brush.Background}"
+        Style="{StaticResource MaterialDesignWindow}">
+    <DockPanel>
+        <materialDesign:ColorZone Mode="PrimaryMid" Padding="12,10" DockPanel.Dock="Top"
+                                  Foreground="Black"
+                                  TextElement.Foreground="Black">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Row 1: brand + month navigation -->
+                <Grid Grid.Row="0" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="CalendarApp"
+                               FontSize="22"
+                               FontWeight="Medium"
+                               VerticalAlignment="Center"
+                               Foreground="Black"
+                               Margin="0,0,16,0"/>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <Button x:Name="PrevMonthButton"
+                                ToolTip="Previous month"
+                                Click="PrevMonth_Click"
+                                Width="48" Height="40"
+                                Margin="0,0,4,0"
+                                Background="#33000000"
+                                BorderThickness="0"
+                                Foreground="Black"
+                                Cursor="Hand"
+                                FontSize="20"
+                                FontWeight="Bold"
+                                Content="◀"/>
+
+                        <TextBlock x:Name="MonthTitle"
+                                   FontSize="18"
+                                   FontWeight="Medium"
+                                   VerticalAlignment="Center"
+                                   MinWidth="200"
+                                   TextAlignment="Center"
+                                   Foreground="Black"
+                                   Margin="8,0"/>
+
+                        <Button x:Name="NextMonthButton"
+                                ToolTip="Next month"
+                                Click="NextMonth_Click"
+                                Width="48" Height="40"
+                                Margin="4,0,0,0"
+                                Background="#33000000"
+                                BorderThickness="0"
+                                Foreground="Black"
+                                Cursor="Hand"
+                                FontSize="20"
+                                FontWeight="Bold"
+                                Content="▶"/>
+
+                        <Button Content="Today"
+                                Margin="16,0,0,0"
+                                Padding="12,6"
+                                Click="Today_Click"
+                                Background="#55000000"
+                                BorderThickness="0"
+                                Foreground="Black"
+                                Cursor="Hand"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Row 2: account status + actions -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MinWidth="160"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock x:Name="StatusText"
+                               Grid.Column="0"
+                               VerticalAlignment="Center"
+                               Margin="0,0,16,0"
+                               Foreground="Black"
+                               Opacity="0.95"
+                               TextTrimming="CharacterEllipsis"
+                               TextWrapping="NoWrap"
+                               ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+
+                    <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="New event"
+                                Margin="0,4,8,4"
+                                Padding="12,6"
+                                Click="NewEvent_Click"
+                                Background="Black"
+                                Foreground="Orange"
+                                BorderThickness="0"/>
+                        <Button x:Name="GoogleSetupButton"
+                                Content="Advanced Google setup"
+                                Margin="0,4,8,4"
+                                Padding="12,6"
+                                Click="GoogleSetup_Click"
+                                Background="#33000000"
+                                BorderThickness="0"
+                                Foreground="Black"
+                                Visibility="Collapsed"/>
+                        <Button x:Name="GoogleSignInButton"
+                                Content="Sign in with Google"
+                                Margin="0,4,8,4"
+                                Padding="12,6"
+                                Click="GoogleSignIn_Click"
+                                Background="#55000000"
+                                BorderThickness="0"
+                                Foreground="Black"/>
+                        <Button Content="Sync with Google"
+                                Margin="0,4,0,4"
+                                Padding="12,6"
+                                Click="PullGoogle_Click"
+                                Background="#33000000"
+                                BorderThickness="0"
+                                Foreground="Black"/>
+                    </WrapPanel>
+                </Grid>
+            </Grid>
+        </materialDesign:ColorZone>
+
+        <StatusBar DockPanel.Dock="Bottom" Background="Transparent" Margin="8">
+            <StatusBarItem>
+                <TextBlock x:Name="FooterText" Text="Native Windows calendar" Foreground="White" Opacity="0.9"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <Grid Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
+                    CornerRadius="8" Padding="12" Margin="0,0,12,0">
+                <DockPanel>
+                    <UniformGrid DockPanel.Dock="Top" Rows="1" Columns="7" Margin="0,0,0,8">
+                        <TextBlock Text="Sun" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Mon" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Tue" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Wed" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Thu" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Fri" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Sat" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    </UniformGrid>
+                    <UniformGrid x:Name="DayGrid" Rows="6" Columns="7"/>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
+                    CornerRadius="8" Padding="12">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Events this month" FontSize="18" FontWeight="Medium" Margin="0,0,0,12"/>
+                    <ListBox x:Name="EventList"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             MouseDoubleClick="EventList_MouseDoubleClick">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,8">
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                    <TextBlock Opacity="0.7" FontSize="12"
+                                               Text="{Binding StartDateTime, StringFormat=All day · {0:d}}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsAllDay}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Opacity="0.7" FontSize="12">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsAllDay}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                        <Run Text="{Binding StartDateTime, StringFormat={}{0:g}}"/>
+                                        <Run Text=" – "/>
+                                        <Run Text="{Binding EndDateTime, StringFormat={}{0:t}}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+.vs/
+.claude/
+*.user
+*.suo
+*.DotSettings.user
+publish/
+artifacts/
+*.log
+
+# Never commit live OAuth secrets used for Release packaging
+CalendarDesktop/appsettings.Production.json
+**/google-oauth.json
+**/credentials.json

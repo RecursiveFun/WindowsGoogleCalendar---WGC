@@ -1,0 +1,40 @@
+<Window x:Class="CalendarDesktop.GoogleSetupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Google Desktop OAuth setup"
+        Height="520" Width="560"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Style="{StaticResource MaterialDesignWindow}">
+    <DockPanel Margin="20">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Open Google Console" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,8,0" Click="OpenConsole_Click"/>
+            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,8,0" IsCancel="True" Click="Cancel_Click"/>
+            <Button Content="Save" Style="{StaticResource MaterialDesignRaisedButton}" IsDefault="True" Click="Save_Click"/>
+        </StackPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Fix Google sign-in" FontSize="22" FontWeight="Medium" Margin="0,0,0,12"/>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,12" Opacity="0.85"
+                           Text="The error &quot;This app's request is invalid&quot; almost always means your OAuth client is type Web application. Desktop CalendarApp needs type Desktop app."/>
+
+                <TextBlock FontWeight="SemiBold" Margin="0,0,0,6" Text="Do this in Google Cloud:"/>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,16" LineHeight="20"
+                           Text="1. Open Credentials&#x0a;2. Create OAuth client ID&#x0a;3. Application type: Desktop app (not Web)&#x0a;4. Copy Client ID and Client Secret below&#x0a;5. Keep Calendar API enabled&#x0a;6. Add your Gmail as a Test user if consent screen is Testing"/>
+
+                <TextBox x:Name="ClientIdBox"
+                         materialDesign:HintAssist.Hint="Desktop Client ID"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,12"/>
+                <TextBox x:Name="ClientSecretBox"
+                         materialDesign:HintAssist.Hint="Desktop Client Secret"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,8"/>
+                <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12"
+                           Text="Tip: you can also download credentials.json for the Desktop client and place it at %LocalAppData%\CalendarApp\credentials.json"/>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

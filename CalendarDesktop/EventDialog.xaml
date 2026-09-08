@@ -1,0 +1,53 @@
+<Window x:Class="CalendarDesktop.EventDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Event"
+        Height="480" Width="460"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Style="{StaticResource MaterialDesignWindow}">
+    <DockPanel Margin="20">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button x:Name="DeleteButton" Content="Delete" Style="{StaticResource MaterialDesignFlatButton}"
+                    Foreground="IndianRed" Margin="0,0,8,0" Click="Delete_Click" Visibility="Collapsed"/>
+            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" IsCancel="True" Margin="0,0,8,0"/>
+            <Button Content="Save" Style="{StaticResource MaterialDesignRaisedButton}" IsDefault="True" Click="Save_Click"/>
+        </StackPanel>
+
+        <StackPanel>
+            <TextBlock x:Name="DialogTitle" Text="Event" FontSize="20" FontWeight="Medium" Margin="0,0,0,16"/>
+            <TextBox x:Name="TitleBox" materialDesign:HintAssist.Hint="Title"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0,0,0,12"/>
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <DatePicker x:Name="StartDate" materialDesign:HintAssist.Hint="Start date"
+                            Style="{StaticResource MaterialDesignOutlinedDatePicker}" Grid.Column="0"/>
+                <TextBox x:Name="StartTime" materialDesign:HintAssist.Hint="Start time (HH:mm)"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}" Grid.Column="2"/>
+            </Grid>
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <DatePicker x:Name="EndDate" materialDesign:HintAssist.Hint="End date"
+                            Style="{StaticResource MaterialDesignOutlinedDatePicker}" Grid.Column="0"/>
+                <TextBox x:Name="EndTime" materialDesign:HintAssist.Hint="End time (HH:mm)"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}" Grid.Column="2"/>
+            </Grid>
+            <CheckBox x:Name="AllDayBox" Content="All day" Margin="0,0,0,12"/>
+            <TextBox x:Name="LocationBox" materialDesign:HintAssist.Hint="Location"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0,0,0,12"/>
+            <TextBox x:Name="DescriptionBox" materialDesign:HintAssist.Hint="Description"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     AcceptsReturn="True" TextWrapping="Wrap" Height="90"
+                     VerticalContentAlignment="Top"/>
+        </StackPanel>
+    </DockPanel>
+</Window>
