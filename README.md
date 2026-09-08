@@ -277,4 +277,4 @@ More detail: [PRODUCTION.md](PRODUCTION.md)
 
 ## License
 
-Private project — add a license here if you distribute it.
+Private project
