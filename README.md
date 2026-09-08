@@ -1,4 +1,4 @@
-# CalendarApp
+# WindowsGoogleCalendar---WGC
 
 Native Windows desktop calendar with two-way Google Calendar sync.
 
