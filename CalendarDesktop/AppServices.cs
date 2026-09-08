@@ -17,10 +17,7 @@ public static class AppServices
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .Build();
 
-        var dbPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CalendarApp",
-            "calendarapp.db");
+        var dbPath = AppPaths.DatabasePath;
         Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
         var services = new ServiceCollection();

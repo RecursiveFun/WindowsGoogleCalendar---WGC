@@ -6,7 +6,7 @@ using WpfApplication = System.Windows.Application;
 namespace CalendarDesktop.Services;
 
 /// <summary>
-/// Keeps CalendarApp running in the notification area when the main window is closed.
+/// Keeps WGC running in the notification area when the main window is closed.
 /// </summary>
 public sealed class TrayIconService : IDisposable
 {
@@ -21,13 +21,13 @@ public sealed class TrayIconService : IDisposable
         if (_notifyIcon != null) return;
 
         var menu = new ContextMenuStrip();
-        menu.Items.Add("Open CalendarApp", null, (_, _) => ShowMainWindow());
+        menu.Items.Add("Open WGC", null, (_, _) => ShowMainWindow());
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => ExitApplication());
 
         _notifyIcon = new NotifyIcon
         {
-            Text = "CalendarApp",
+            Text = "WGC",
             Visible = true,
             ContextMenuStrip = menu,
             Icon = LoadAppIcon()
@@ -45,7 +45,7 @@ public sealed class TrayIconService : IDisposable
         if (_notifyIcon == null || _shownMinimizeTip) return;
 
         _shownMinimizeTip = true;
-        _notifyIcon.BalloonTipTitle = "CalendarApp is still running";
+        _notifyIcon.BalloonTipTitle = "WGC is still running";
         _notifyIcon.BalloonTipText = "The app stays in the notification area so event reminders keep working. Right-click the icon to Exit.";
         _notifyIcon.ShowBalloonTip(4000);
     }

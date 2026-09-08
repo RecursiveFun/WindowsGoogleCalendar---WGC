@@ -1,8 +1,32 @@
-# CalendarApp
+# WGC (Windows Google Calendar)
 
 Native Windows desktop calendar with two-way **Google Calendar** sync, toast reminders, and tray background mode.
 
 Built with **WPF** (.NET 9), **Material Design**, **SQLite**, and the **Google Calendar API**.
+
+---
+
+## Screenshots
+
+### Main calendar
+Month grid, event list, Google account status, and sync controls.
+
+![WGC main calendar window](docs/screenshots/01-main-calendar.png)
+
+### Event details (read-only)
+Click an event to review everything without editing. Use **Edit**, **Delete**, or **Close**.
+
+![Event details dialog](docs/screenshots/02-event-details.png)
+
+### Edit event
+After **Edit**, fields become writable. Save pushes to Google when signed in.
+
+![Edit event dialog](docs/screenshots/03-edit-event.png)
+
+### New event
+Create a timed or all-day event with title, location, and description.
+
+![New event dialog](docs/screenshots/04-new-event.png)
 
 ---
 
@@ -12,8 +36,9 @@ Built with **WPF** (.NET 9), **Material Design**, **SQLite**, and the **Google C
 - Month grid with up to 3 event chips per day
 - Side list of events for the visible month
 - Create, edit, and delete events (dialog)
-- Double-click a day to create; double-click a list item to edit
+- Double-click a day to create; click an event to view details
 - All-day and timed events, plus location and description
+- Polymorphic dialog modes: **view** (read-only) → **Edit** → **Save**
 
 ### Google Calendar sync
 - Sign in with Google (Desktop OAuth)
@@ -25,12 +50,13 @@ Built with **WPF** (.NET 9), **Material Design**, **SQLite**, and the **Google C
 
 ### Reminders & background
 - Windows **toast notification** ~**15 minutes** before a timed event starts
+- Reminder-style toasts stay visible until dismissed
 - Closing the main window **does not quit** — the app stays in the **notification area (tray)** so reminders and sync keep running
-- Tray: double-click or **Open CalendarApp** to restore; **Exit** to quit for real
+- Tray: double-click or **Open WGC** to restore; **Exit** to quit for real
 
 ### App polish
 - Dark + orange Material Design UI
-- Local SQLite storage and rolling logs under `%LocalAppData%\CalendarApp`
+- Local SQLite storage and rolling logs under `%LocalAppData%\WGC`
 - Versioned Release packaging via `scripts/publish.ps1`
 
 ---
@@ -49,11 +75,11 @@ Built with **WPF** (.NET 9), **Material Design**, **SQLite**, and the **Google C
 
 ```powershell
 cd "E:\Coding and Development\Bot\DotNetApp"
-dotnet restore CalendarApp.sln
+dotnet restore WGC.sln
 dotnet run --project CalendarDesktop\CalendarDesktop.csproj
 ```
 
-Or open `CalendarApp.sln` in Visual Studio and press F5.
+Or open `WGC.sln` in Visual Studio and press F5.
 
 ### First-time Google setup (dev)
 
@@ -67,7 +93,7 @@ Or open `CalendarApp.sln` in Visual Studio and press F5.
 
 Credentials are stored at:
 
-`%LocalAppData%\CalendarApp\google-oauth.json`
+`%LocalAppData%\WGC\google-oauth.json`
 
 ---
 
@@ -84,7 +110,7 @@ Credentials are stored at:
 | Sign out | Button becomes **Sign out** when connected |
 | Force sync | **Sync with Google** |
 | Hide to tray | Close the window (X) |
-| Open from tray | Double-click tray icon, or right-click → **Open CalendarApp** |
+| Open from tray | Double-click tray icon, or right-click → **Open WGC** |
 | Quit completely | Tray → right-click → **Exit** |
 
 ### Sync behavior (when signed in)
@@ -106,8 +132,8 @@ Credentials are stored at:
 
 ```
 DotNetApp/
-├── CalendarApp.sln
-├── CalendarDesktop/                 # WPF app
+├── WGC.sln
+├── CalendarDesktop/                 # WPF app (assembly: WGC.exe)
 │   ├── Assets/app.ico
 │   ├── Services/
 │   │   ├── EventService.cs
@@ -120,9 +146,11 @@ DotNetApp/
 │   ├── MainWindow.xaml
 │   ├── EventDialog.xaml
 │   └── GoogleSetupWindow.xaml
+├── docs/
+│   └── screenshots/                 # README screenshots
 ├── scripts/
 │   ├── publish.ps1                  # Release package builder
-│   └── CalendarApp.iss              # Optional Inno Setup installer
+│   └── WGC.iss                      # Optional Inno Setup installer
 ├── artifacts/                       # Publish output (generated, gitignored)
 ├── PRODUCTION.md                    # Production checklist & details
 ├── README.md
@@ -149,8 +177,8 @@ DotNetApp/
 Load order at runtime:
 
 1. Bundled `appsettings.json` next to the EXE (preferred for production builds)
-2. `%LocalAppData%\CalendarApp\credentials.json` (Google Desktop download)
-3. `%LocalAppData%\CalendarApp\google-oauth.json` (Advanced setup)
+2. `%LocalAppData%\WGC\credentials.json` (Google Desktop download)
+3. `%LocalAppData%\WGC\google-oauth.json` (Advanced setup)
 
 Do **not** commit real Client secrets to git.
 
@@ -158,10 +186,12 @@ Do **not** commit real Client secrets to git.
 
 | Path | Purpose |
 |---|---|
-| `%LocalAppData%\CalendarApp\calendarapp.db` | Local events + connection state |
-| `%LocalAppData%\CalendarApp\GoogleAuth\` | OAuth tokens |
-| `%LocalAppData%\CalendarApp\logs\` | Rolling Serilog logs |
-| `%LocalAppData%\CalendarApp\google-oauth.json` | Dev / override OAuth client |
+| `%LocalAppData%\WGC\wgc.db` | Local events + connection state |
+| `%LocalAppData%\WGC\GoogleAuth\` | OAuth tokens |
+| `%LocalAppData%\WGC\logs\` | Rolling Serilog logs |
+| `%LocalAppData%\WGC\google-oauth.json` | Dev / override OAuth client |
+
+On first launch after the rename, data is migrated automatically from the legacy `%LocalAppData%\CalendarApp` folder if present.
 
 ---
 
@@ -178,22 +208,22 @@ This will:
 1. Publish a **self-contained** `win-x64` single-file Release build
 2. Embed OAuth from your local `google-oauth.json` into the package
 3. Create:
-   - `artifacts\CalendarApp-1.0.0-win-x64\`
-   - `artifacts\CalendarApp-1.0.0-win-x64.zip`
+   - `artifacts\WGC-1.0.0-win-x64\`
+   - `artifacts\WGC-1.0.0-win-x64.zip`
 
-End users unzip (or install), run `CalendarApp.exe`, and click **Sign in with Google** — no setup dialog when OAuth is embedded.
+End users unzip (or install), run `WGC.exe`, and click **Sign in with Google** — no setup dialog when OAuth is embedded.
 
 ### Optional installer
 
 1. Run `.\scripts\publish.ps1`
-2. Compile `scripts\CalendarApp.iss` with [Inno Setup](https://jrsoftware.org/isinfo.php)
+2. Compile `scripts\WGC.iss` with [Inno Setup](https://jrsoftware.org/isinfo.php)
 
 ### Optional Authenticode signing
 
 This is a **Windows code-signing certificate** thumbprint, not an OAuth value:
 
 ```powershell
-$env:CALENDARAPP_SIGN_THUMBPRINT = "YOUR_CERT_SHA1_THUMBPRINT"
+$env:WGC_SIGN_THUMBPRINT = "YOUR_CERT_SHA1_THUMBPRINT"
 .\scripts\publish.ps1
 ```
 
@@ -228,9 +258,9 @@ More detail: [PRODUCTION.md](PRODUCTION.md)
 | Events don’t appear in Google | Confirm status shows your email (signed in); check footer / logs |
 | Deleted Google events still show | Wait for auto-sync, click **Sync with Google**, or restore from tray and sync |
 | No toast reminder | App must be running (window or tray); event must be timed (not all-day); start within ~15 minutes |
-| Closed the window and can’t find the app | Check the notification area (system tray); double-click the CalendarApp icon |
+| Closed the window and can’t find the app | Check the notification area (system tray); double-click the WGC icon |
 | Want to quit completely | Tray → right-click → **Exit** |
-| Crash / sync errors | `%LocalAppData%\CalendarApp\logs\` |
+| Crash / sync errors | `%LocalAppData%\WGC\logs\` |
 
 ---
 

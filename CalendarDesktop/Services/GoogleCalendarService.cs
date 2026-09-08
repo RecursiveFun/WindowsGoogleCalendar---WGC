@@ -24,10 +24,7 @@ public class GoogleCalendarService
     {
         _db = db;
         _options = options.Value;
-        _tokenStorePath = IOPath.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CalendarApp",
-            "GoogleAuth");
+        _tokenStorePath = AppPaths.GoogleAuthDirectory;
 
         // Production: bundled appsettings first; LocalAppData is a fallback for debug/dev.
         var stored = GoogleConfigStore.Load();
@@ -366,7 +363,7 @@ public class GoogleCalendarService
             return (new CalendarService(new BaseClientService.Initializer
             {
                 HttpClientInitializer = credential,
-                ApplicationName = "CalendarApp"
+                ApplicationName = "WGC"
             }), null);
         }
         catch (Exception ex)
@@ -403,7 +400,7 @@ public class GoogleCalendarService
             var service = new CalendarService(new BaseClientService.Initializer
             {
                 HttpClientInitializer = credential,
-                ApplicationName = "CalendarApp"
+                ApplicationName = "WGC"
             });
             var calendar = await service.Calendars.Get("primary").ExecuteAsync();
             return calendar.Id;

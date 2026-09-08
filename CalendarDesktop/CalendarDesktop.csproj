@@ -7,17 +7,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationTitle>CalendarApp</ApplicationTitle>
-    <Product>CalendarApp</Product>
-    <AssemblyName>CalendarApp</AssemblyName>
+    <ApplicationTitle>WGC</ApplicationTitle>
+    <Product>WGC</Product>
+    <AssemblyName>WGC</AssemblyName>
     <RootNamespace>CalendarDesktop</RootNamespace>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <InformationalVersion>1.0.0</InformationalVersion>
-    <Company>CalendarApp</Company>
-    <Authors>CalendarApp</Authors>
-    <Description>Windows calendar with Google Calendar sync</Description>
+    <Company>WGC</Company>
+    <Authors>WGC</Authors>
+    <Description>Windows Google Calendar (WGC)</Description>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 

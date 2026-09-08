@@ -18,7 +18,7 @@
             <StackPanel>
                 <TextBlock Text="Fix Google sign-in" FontSize="22" FontWeight="Medium" Margin="0,0,0,12"/>
                 <TextBlock TextWrapping="Wrap" Margin="0,0,0,12" Opacity="0.85"
-                           Text="The error &quot;This app's request is invalid&quot; almost always means your OAuth client is type Web application. Desktop CalendarApp needs type Desktop app."/>
+                           Text="The error &quot;This app's request is invalid&quot; almost always means your OAuth client is type Web application. Desktop WGC needs type Desktop app."/>
 
                 <TextBlock FontWeight="SemiBold" Margin="0,0,0,6" Text="Do this in Google Cloud:"/>
                 <TextBlock TextWrapping="Wrap" Margin="0,0,0,16" LineHeight="20"
@@ -33,7 +33,7 @@
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
                          Margin="0,0,0,8"/>
                 <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12"
-                           Text="Tip: you can also download credentials.json for the Desktop client and place it at %LocalAppData%\CalendarApp\credentials.json"/>
+                           Text="Tip: you can also download credentials.json for the Desktop client and place it at %LocalAppData%\WGC\credentials.json"/>
             </StackPanel>
         </ScrollViewer>
     </DockPanel>

@@ -11,16 +11,13 @@ public static class AppLog
         .WriteTo.Debug()
         .CreateLogger();
 
-    public static string LogDirectory { get; private set; } =
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CalendarApp",
-            "logs");
+    public static string LogDirectory { get; private set; } = AppPaths.LogsDirectory;
 
     public static void Initialize()
     {
+        LogDirectory = AppPaths.LogsDirectory;
         Directory.CreateDirectory(LogDirectory);
-        var logPath = Path.Combine(LogDirectory, "calendarapp-.log");
+        var logPath = Path.Combine(LogDirectory, "wgc-.log");
 
         Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
@@ -35,13 +32,13 @@ public static class AppLog
             .CreateLogger();
 
         Log.Logger = Logger;
-        Logger.Information("CalendarApp starting (version {Version})",
+        Logger.Information("WGC starting (version {Version})",
             typeof(AppLog).Assembly.GetName().Version?.ToString() ?? "unknown");
     }
 
     public static void Close()
     {
-        Logger.Information("CalendarApp shutting down");
+        Logger.Information("WGC shutting down");
         Log.CloseAndFlush();
     }
 }

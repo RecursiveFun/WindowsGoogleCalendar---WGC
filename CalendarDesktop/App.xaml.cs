@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using CalendarDesktop.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,7 +18,7 @@ public partial class App : Application
             AppLog.Logger.Fatal(args.Exception, "Unhandled UI exception");
             MessageBox.Show(
                 $"Something went wrong:\n\n{args.Exception.Message}\n\nDetails were written to:\n{AppLog.LogDirectory}",
-                "CalendarApp",
+                "WGC",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             args.Handled = true;
@@ -45,8 +45,8 @@ public partial class App : Application
         {
             AppLog.Logger.Fatal(ex, "Startup failed");
             MessageBox.Show(
-                $"CalendarApp failed to start:\n\n{ex.Message}",
-                "CalendarApp",
+                $"WGC failed to start:\n\n{ex.Message}",
+                "WGC",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             Shutdown(1);

@@ -1,12 +1,12 @@
-; Inno Setup script for CalendarApp
+; Inno Setup script for WGC
 ; Compile with Inno Setup after running scripts\publish.ps1
 ; Optional signing: set SignTool in Inno or sign the installer afterward.
 
-#define AppName "CalendarApp"
+#define AppName "WGC"
 #define AppVersion "1.0.0"
-#define AppPublisher "CalendarApp"
-#define AppExeName "CalendarApp.exe"
-#define PublishDir "..\artifacts\CalendarApp-1.0.0-win-x64"
+#define AppPublisher "WGC"
+#define AppExeName "WGC.exe"
+#define PublishDir "..\artifacts\WGC-1.0.0-win-x64"
 
 [Setup]
 AppId={{8F3C2B1A-9D4E-4F6A-B7C8-1E2D3C4B5A6F}
@@ -17,7 +17,7 @@ DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 OutputDir=..\artifacts
-OutputBaseFilename=CalendarAppSetup-{#AppVersion}
+OutputBaseFilename=WGCSetup-{#AppVersion}
 SetupIconFile=..\CalendarDesktop\Assets\app.ico
 Compression=lzma
 SolidCompression=yes

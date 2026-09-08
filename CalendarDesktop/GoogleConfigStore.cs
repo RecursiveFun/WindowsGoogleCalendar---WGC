@@ -12,20 +12,12 @@ public static class GoogleConfigStore
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public static string UserConfigPath =>
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CalendarApp",
-            "google-oauth.json");
+    public static string UserConfigPath => AppPaths.GoogleOAuthPath;
 
     public static string BundledConfigPath =>
         Path.Combine(AppContext.BaseDirectory, "appsettings.json");
 
-    public static string CredentialsJsonPath =>
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CalendarApp",
-            "credentials.json");
+    public static string CredentialsJsonPath => AppPaths.CredentialsJsonPath;
 
     public static GoogleCalendarOptions Load()
     {
