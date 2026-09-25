@@ -9,30 +9,39 @@ Built with **WPF** (.NET 9), **Material Design**, **SQLite**, and the **Google C
 ## Screenshots
 
 ### Main calendar
+
 Month grid, event list, Google account status, and sync controls.
 
-![WGC main calendar window](docs/screenshots/01-main-calendar.png)
+WGC main calendar window
 
 ### Event details (read-only)
+
 Click an event to review everything without editing. Use **Edit**, **Delete**, or **Close**.
 
-![Event details dialog](docs/screenshots/02-event-details.png)
+Event details dialog
 
 ### Edit event
+
 After **Edit**, fields become writable. Save pushes to Google when signed in.
 
-![Edit event dialog](docs/screenshots/03-edit-event.png)
+Edit event dialog
 
 ### New event
+
 Create a timed or all-day event with title, location, and description.
 
-![New event dialog](docs/screenshots/04-new-event.png)
+New event dialog
 
 ---
 
+
+
 ## Features
 
+
+
 ### Calendar
+
 - Month grid with up to 3 event chips per day
 - Side list of events for the visible month
 - Create, edit, and delete events (dialog)
@@ -40,7 +49,10 @@ Create a timed or all-day event with title, location, and description.
 - All-day and timed events, plus location and description
 - Polymorphic dialog modes: **view** (read-only) → **Edit** → **Save**
 
+
+
 ### Google Calendar sync
+
 - Sign in with Google (Desktop OAuth)
 - **Push**: local create / update / delete syncs to Google when signed in
 - **Pull**: imports Google events and updates local copies
@@ -48,18 +60,26 @@ Create a timed or all-day event with title, location, and description.
 - Removes local events that were deleted in Google Calendar
 - **Advanced Google setup** only appears if OAuth is not already configured
 
+
+
 ### Reminders & background
+
 - Windows **toast notification** ~**15 minutes** before a timed event starts
 - Reminder-style toasts stay visible until dismissed
 - Closing the main window **does not quit** — the app stays in the **notification area (tray)** so reminders and sync keep running
 - Tray: double-click or **Open WGC** to restore; **Exit** to quit for real
 
+
+
 ### App polish
+
 - Dark + orange Material Design UI
 - Local SQLite storage and rolling logs under `%LocalAppData%\WGC`
 - Versioned Release packaging via `scripts/publish.ps1`
 
 ---
+
+
 
 ## Requirements
 
@@ -71,22 +91,41 @@ Create a timed or all-day event with title, location, and description.
 
 ---
 
+
+
 ## Quick start (development)
 
 ```powershell
-cd "E:\Coding and Development\Bot\DotNetApp"
+cd "E:\CalendarDesktop"
 dotnet restore WGC.sln
 dotnet run --project CalendarDesktop\CalendarDesktop.csproj
 ```
 
 Or open `WGC.sln` in Visual Studio and press F5.
 
+### Run tests
+
+```powershell
+dotnet test WGC.sln
+```
+
+The `CalendarDesktop.Tests` project covers:
+
+- Event CRUD, range queries, reminder windows, all-day end normalization
+- Google date mapping (all-day exclusive ends, timed offsets, import fixes)
+- Dialog mode polymorphism (view / edit / create)
+- OAuth config validation (`IsUsable`)
+- Google connection state (connected / sign-out)
+- App data path naming (`%LocalAppData%\WGC\...`)
+
+---
+
 ### First-time Google setup (dev)
 
 1. In [Google Cloud Console](https://console.cloud.google.com/):
-   - Enable **Google Calendar API**
-   - Create OAuth client → Application type: **Desktop app**
-   - Copy **Client ID** and **Client Secret**
+  - Enable **Google Calendar API**
+  - Create OAuth client → Application type: **Desktop app**
+  - Copy **Client ID** and **Client Secret**
 2. In the app, if OAuth is not embedded yet, use **Advanced Google setup** and paste those values.
 3. Click **Sign in with Google** and finish the browser consent flow.
 4. If the consent screen is **Testing**, add your Gmail as a test user.
@@ -97,21 +136,27 @@ Credentials are stored at:
 
 ---
 
+
+
 ## Using the app
 
-| Action | How |
-|---|---|
-| Change month | ◀ / ▶ or **Today** |
-| New event | **New event**, or double-click a day |
-| View event details | Click an event in the list or a day chip |
-| Edit event | Open details → **Edit** → **Save** |
-| Delete event | From details or edit → **Delete** |
-| Connect Google | **Sign in with Google** |
-| Sign out | Button becomes **Sign out** when connected |
-| Force sync | **Sync with Google** |
-| Hide to tray | Close the window (X) |
-| Open from tray | Double-click tray icon, or right-click → **Open WGC** |
-| Quit completely | Tray → right-click → **Exit** |
+
+| Action             | How                                                   |
+| ------------------ | ----------------------------------------------------- |
+| Change month       | ◀ / ▶ or **Today**                                    |
+| New event          | **New event**, or double-click a day                  |
+| View event details | Click an event in the list or a day chip              |
+| Edit event         | Open details → **Edit** → **Save**                    |
+| Delete event       | From details or edit → **Delete**                     |
+| Connect Google     | **Sign in with Google**                               |
+| Sign out           | Button becomes **Sign out** when connected            |
+| Force sync         | **Sync with Google**                                  |
+| Hide to tray       | Close the window (X)                                  |
+| Open from tray     | Double-click tray icon, or right-click → **Open WGC** |
+| Quit completely    | Tray → right-click → **Exit**                         |
+
+
+
 
 ### Sync behavior (when signed in)
 
@@ -120,6 +165,8 @@ Credentials are stored at:
 - Auto-sync **pulls** changes from Google (including deletions)
 - Footer status shows sync progress and results
 
+
+
 ### Reminders
 
 - While the app is running (window open **or** in the tray), timed events get a toast ~15 minutes before start
@@ -127,6 +174,8 @@ Credentials are stored at:
 - Each event is notified once per start time (no spam if the checker runs again)
 
 ---
+
+
 
 ## Project layout
 
@@ -146,6 +195,7 @@ DotNetApp/
 │   ├── MainWindow.xaml
 │   ├── EventDialog.xaml
 │   └── GoogleSetupWindow.xaml
+├── CalendarDesktop.Tests/           # xUnit unit/integration tests
 ├── docs/
 │   └── screenshots/                 # README screenshots
 ├── scripts/
@@ -159,7 +209,11 @@ DotNetApp/
 
 ---
 
+
+
 ## Configuration
+
+
 
 ### Bundled settings
 
@@ -184,16 +238,20 @@ Do **not** commit real Client secrets to git.
 
 ### Local data
 
-| Path | Purpose |
-|---|---|
-| `%LocalAppData%\WGC\wgc.db` | Local events + connection state |
-| `%LocalAppData%\WGC\GoogleAuth\` | OAuth tokens |
-| `%LocalAppData%\WGC\logs\` | Rolling Serilog logs |
-| `%LocalAppData%\WGC\google-oauth.json` | Dev / override OAuth client |
+
+| Path                                   | Purpose                         |
+| -------------------------------------- | ------------------------------- |
+| `%LocalAppData%\WGC\wgc.db`            | Local events + connection state |
+| `%LocalAppData%\WGC\GoogleAuth\`       | OAuth tokens                    |
+| `%LocalAppData%\WGC\logs\`             | Rolling Serilog logs            |
+| `%LocalAppData%\WGC\google-oauth.json` | Dev / override OAuth client     |
+
 
 On first launch after the rename, data is migrated automatically from the legacy `%LocalAppData%\CalendarApp` folder if present.
 
 ---
+
+
 
 ## Production build
 
@@ -208,8 +266,8 @@ This will:
 1. Publish a **self-contained** `win-x64` single-file Release build
 2. Embed OAuth from your local `google-oauth.json` into the package
 3. Create:
-   - `artifacts\WGC-1.0.0-win-x64\`
-   - `artifacts\WGC-1.0.0-win-x64.zip`
+  - `artifacts\WGC-1.0.0-win-x64\`
+  - `artifacts\WGC-1.0.0-win-x64.zip`
 
 End users unzip (or install), run `WGC.exe`, and click **Sign in with Google** — no setup dialog when OAuth is embedded.
 
@@ -217,6 +275,8 @@ End users unzip (or install), run `WGC.exe`, and click **Sign in with Google** �
 
 1. Run `.\scripts\publish.ps1`
 2. Compile `scripts\WGC.iss` with [Inno Setup](https://jrsoftware.org/isinfo.php)
+
+
 
 ### Optional Authenticode signing
 
@@ -238,10 +298,12 @@ Without signing, Windows may show an “unknown publisher” / SmartScreen warni
 
 ### Google Cloud for other users
 
-| Audience | Consent screen |
-|---|---|
-| Just you / small team | Keep **Testing** and add test users |
-| Public / many users | Set status to **In production** (verification may be required for Calendar scopes) |
+
+| Audience              | Consent screen                                                                     |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| Just you / small team | Keep **Testing** and add test users                                                |
+| Public / many users   | Set status to **In production** (verification may be required for Calendar scopes) |
+
 
 Keep the OAuth client type as **Desktop app**.
 
@@ -249,20 +311,26 @@ More detail: [PRODUCTION.md](PRODUCTION.md)
 
 ---
 
+
+
 ## Troubleshooting
 
-| Symptom | What to check |
-|---|---|
-| “This app’s request is invalid” | OAuth client must be **Desktop app**, not Web |
-| Sign-in works for you but not others | Consent screen still **Testing** — add them as test users or publish |
-| Events don’t appear in Google | Confirm status shows your email (signed in); check footer / logs |
-| Deleted Google events still show | Wait for auto-sync, click **Sync with Google**, or restore from tray and sync |
-| No toast reminder | App must be running (window or tray); event must be timed (not all-day); start within ~15 minutes |
-| Closed the window and can’t find the app | Check the notification area (system tray); double-click the WGC icon |
-| Want to quit completely | Tray → right-click → **Exit** |
-| Crash / sync errors | `%LocalAppData%\WGC\logs\` |
+
+| Symptom                                  | What to check                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| “This app’s request is invalid”          | OAuth client must be **Desktop app**, not Web                                                     |
+| Sign-in works for you but not others     | Consent screen still **Testing** — add them as test users or publish                              |
+| Events don’t appear in Google            | Confirm status shows your email (signed in); check footer / logs                                  |
+| Deleted Google events still show         | Wait for auto-sync, click **Sync with Google**, or restore from tray and sync                     |
+| No toast reminder                        | App must be running (window or tray); event must be timed (not all-day); start within ~15 minutes |
+| Closed the window and can’t find the app | Check the notification area (system tray); double-click the WGC icon                              |
+| Want to quit completely                  | Tray → right-click → **Exit**                                                                     |
+| Crash / sync errors                      | `%LocalAppData%\WGC\logs\`                                                                        |
+
 
 ---
+
+
 
 ## Tech stack
 
@@ -275,6 +343,8 @@ More detail: [PRODUCTION.md](PRODUCTION.md)
 
 ---
 
+
+
 ## License
 
-Private project — add a license here if you distribute it.
+Private project

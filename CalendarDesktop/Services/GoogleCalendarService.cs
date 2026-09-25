@@ -186,11 +186,11 @@ public class GoogleCalendarService
                         var existing = await _db.Events
                             .FirstOrDefaultAsync(e => e.GoogleEventId == googleEvent.Id);
 
-                        var start = ResolveDate(googleEvent.Start);
-                        var end = googleEvent.End == null ? start.AddHours(1) : ResolveDate(googleEvent.End);
+                        var start = GoogleEventDateMapper.ResolveDate(googleEvent.Start);
+                        var end = googleEvent.End == null ? start.AddHours(1) : GoogleEventDateMapper.ResolveDate(googleEvent.End);
                         var allDay = !string.IsNullOrEmpty(googleEvent.Start?.Date);
                         // Google all-day ends are exclusive (midnight of the next day).
-                        end = NormalizeImportedAllDayEnd(start, end, allDay);
+                        end = GoogleEventDateMapper.NormalizeImportedAllDayEnd(start, end, allDay);
 
                         if (existing == null)
                         {
@@ -275,7 +275,7 @@ public class GoogleCalendarService
                 return (false, authError ?? "Not signed in to Google. Sign in to sync events.");
             }
 
-            var googleEvent = MapToGoogle(localEvent);
+            var googleEvent = GoogleEventDateMapper.MapToGoogle(localEvent);
 
             if (string.IsNullOrEmpty(localEvent.GoogleEventId))
             {
@@ -409,92 +409,5 @@ public class GoogleCalendarService
         {
             return null;
         }
-    }
-
-    private static Event MapToGoogle(CalendarEvent local)
-    {
-        var googleEvent = new Event
-        {
-            Summary = local.Title,
-            Description = local.Description,
-            Location = local.Location
-        };
-
-        if (local.IsAllDay)
-        {
-            googleEvent.Start = new EventDateTime { Date = local.StartDateTime.ToString("yyyy-MM-dd") };
-            // Google expects an exclusive end date for all-day events.
-            var exclusiveEnd = local.EndDateTime.Date.AddDays(1);
-            googleEvent.End = new EventDateTime { Date = exclusiveEnd.ToString("yyyy-MM-dd") };
-        }
-        else
-        {
-            // Google requires IANA time zones (e.g. America/New_York), not Windows IDs.
-            googleEvent.Start = ToGoogleDateTime(local.StartDateTime);
-            googleEvent.End = ToGoogleDateTime(local.EndDateTime);
-        }
-
-        return googleEvent;
-    }
-
-    private static EventDateTime ToGoogleDateTime(DateTime local)
-    {
-        var dto = new DateTimeOffset(DateTime.SpecifyKind(local, DateTimeKind.Local));
-        var value = new EventDateTime { DateTimeDateTimeOffset = dto };
-
-        if (TimeZoneInfo.TryConvertWindowsIdToIanaId(TimeZoneInfo.Local.Id, out var ianaId)
-            && !string.IsNullOrEmpty(ianaId))
-        {
-            value.TimeZone = ianaId;
-        }
-
-        return value;
-    }
-
-    private static DateTime NormalizeImportedAllDayEnd(DateTime start, DateTime end, bool allDay)
-    {
-        if (!allDay)
-        {
-            return end;
-        }
-
-        // Exclusive end at 00:00 of the following day → last inclusive moment of prior day.
-        if (end.TimeOfDay == TimeSpan.Zero && end > start.Date)
-        {
-            return end.Date.AddDays(-1).AddHours(23).AddMinutes(59);
-        }
-
-        if (end.Date == start.Date)
-        {
-            return start.Date.AddHours(23).AddMinutes(59);
-        }
-
-        return end.TimeOfDay == TimeSpan.Zero
-            ? end.Date.AddHours(23).AddMinutes(59)
-            : end;
-    }
-
-    private static DateTime ResolveDate(EventDateTime? value)
-    {
-        if (value == null) return DateTime.Now;
-
-        if (value.DateTimeDateTimeOffset.HasValue)
-        {
-            return value.DateTimeDateTimeOffset.Value.LocalDateTime;
-        }
-
-        if (!string.IsNullOrEmpty(value.Date) && DateTime.TryParse(value.Date, out var dateOnly))
-        {
-            return dateOnly.Date;
-        }
-
-#pragma warning disable CS0618
-        if (value.DateTime.HasValue)
-        {
-            return DateTime.SpecifyKind(value.DateTime.Value, DateTimeKind.Local);
-        }
-#pragma warning restore CS0618
-
-        return DateTime.Now;
     }
 }
