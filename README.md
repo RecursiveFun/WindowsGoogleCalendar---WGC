@@ -12,29 +12,27 @@ Built with **WPF** (.NET 9), **Material Design**, **SQLite**, and the **Google C
 
 Month grid, event list, Google account status, and sync controls.
 
-WGC main calendar window
+![WGC main calendar window](docs/screenshots/01-main-calendar.png)
 
 ### Event details (read-only)
 
 Click an event to review everything without editing. Use **Edit**, **Delete**, or **Close**.
 
-Event details dialog
+![Event details dialog](docs/screenshots/02-event-details.png)
 
 ### Edit event
 
 After **Edit**, fields become writable. Save pushes to Google when signed in.
 
-Edit event dialog
+![Edit event dialog](docs/screenshots/03-edit-event.png)
 
 ### New event
 
 Create a timed or all-day event with title, location, and description.
 
-New event dialog
+![New event dialog](docs/screenshots/04-new-event.png)
 
 ---
-
-
 
 ## Features
 
